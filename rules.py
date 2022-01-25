@@ -26,7 +26,7 @@ def rules(text, showpendapat=False):
     # print(query)
   
   elif(re.search("show [a-zA-Z]+ hadith about [a-zA-Z]+ during|and|or [a-zA-Z]+", text)):
-    topic = re.findall(r"\w+\s(?=\bduring\b|\band\b|\bor\b)", text) + re.findall(r"(?<=[\bor\b|\bduring\b|\band\b])\s\w+", text)
+    topic = re.findall(r"\w+\s(?=\bduring\b|\band\b|\bor\b|\bwhile\b)", text) + re.findall(r"(?<=[\bor\b|\bduring\b|\band\b|\bwhile\b])\s\w+", text)
     print("Masuk ke 3 ", topic)
     query=r"MATCH (m:Matn) WHERE toLower(m.matn) =~ '(?i).*\\b{} \\b.*' AND toLower(m.matn) =~ '(?i).*\\b{} \\b.*' RETURN m.matn AS Matn".format(topic[0].strip(), topic[-1].strip())
     

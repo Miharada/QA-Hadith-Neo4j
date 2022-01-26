@@ -14,7 +14,7 @@ def rules(text, showpendapat=False):
     if showpendapat:
       Qpendapat="(p:Pendapat)--"
       colPendapat=",p.pendapat AS Pendapat"
-    query = r"MATCH {}(m:Matn)-[:NARRATED_BY]->(s:Sanad) WHERE toLower(m.matn) =~ '(?i).*\\b{} \\b.*' RETURN m.number AS Numbe, m.matn AS Matn, s.name AS Sanad{}".format(Qpendapat,topic,colPendapat)
+    query = r"MATCH {}(b:Book)<-[:FROM_BOOK]-(m:Matn)-[:NARRATED_BY]->(s:Sanad) WHERE toLower(m.matn) =~ '(?i).*\\b{} \\b.*' RETURN b.book AS Book, m.number AS Number, m.matn AS Matn, s.name AS Sanad{}".format(Qpendapat,topic,colPendapat)
 
   elif(notEmpty(re.findall(r"(?<=\bshow\s)(\w+)", text)) and notEmpty(re.findall(r"(?<=\bnarrated by\s)(\w+)", text))):
     topic = re.findall(r"(?<=narrated by)(.*)(?=and)", text)
@@ -22,13 +22,13 @@ def rules(text, showpendapat=False):
     if showpendapat:
       Qpendapat="(p:Pendapat)--"
       colPendapat=",p.pendapat AS Pendapat"
-    query="MATCH {}(m:Matn)-[:NARRATED_BY]->(s:Sanad) WHERE toLower(s.name) CONTAINS toLower(\'{}\') and toLower(m.matn) CONTAINS toLower(\'{}\') RETURN s.name AS Sanad, m.number AS Number ,m.matn AS Matn{}".format(Qpendapat, topic[0].strip(), text.split()[-1], colPendapat)
+    query="MATCH {}(b:Book)<-[:FROM_BOOK]-(m:Matn)-[:NARRATED_BY]->(s:Sanad) WHERE toLower(s.name) CONTAINS toLower(\'{}\') and toLower(m.matn) CONTAINS toLower(\'{}\') RETURN s.name AS Sanad, b.book AS Book,m.number AS Number ,m.matn AS Matn{}".format(Qpendapat, topic[0].strip(), text.split()[-1], colPendapat)
     # print(query)
   
   elif(re.search("show [a-zA-Z]+ hadith about [a-zA-Z]+ during|and|or [a-zA-Z]+", text)):
     topic = re.findall(r"\w+\s(?=\bduring\b|\band\b|\bor\b|\bwhile\b)", text) + re.findall(r"(?<=[\bor\b|\bduring\b|\band\b|\bwhile\b])\s\w+", text)
     print("Masuk ke 3 ", topic)
-    query=r"MATCH (m:Matn) WHERE toLower(m.matn) =~ '(?i).*\\b{} \\b.*' AND toLower(m.matn) =~ '(?i).*\\b{} \\b.*' RETURN m.number AS Number, m.matn AS Matn".format(topic[0].strip(), topic[-1].strip())
+    query=r"MATCH (b:Book)<-[:FROM_BOOK]-(m:Matn) WHERE toLower(m.matn) =~ '(?i).*\\b{} \\b.*' AND toLower(m.matn) =~ '(?i).*\\b{} \\b.*' RETURN b.book AS Book, m.number AS Number, m.matn AS Matn".format(topic[0].strip(), topic[-1].strip())
     
   elif(notEmpty(re.findall(r"is(\s+([a-zA-Z]+\s+)+)(halal|haram)\?", text))):
     topic = list(re.findall(r"is(\s+([a-zA-Z]+\s+)+)(halal|haram)\?", text)[0])
@@ -37,7 +37,7 @@ def rules(text, showpendapat=False):
       topic[-1] = 'prohibited'
     elif topic[-1] == "halal":
       topic[-1] = 'lawful'
-    query="MATCH (m:Matn) WHERE m.matn CONTAINS \'{}\' and m.matn CONTAINS \'{}\' RETURN m.number AS Number, m.matn AS Matn".format(topic[1].strip(), topic[-1])
+    query="MATCH (b:Book)<-[:FROM_BOOK]-(m:Matn) WHERE m.matn CONTAINS \'{}\' and m.matn CONTAINS \'{}\' RETURN b.book AS Book, m.number AS Number, m.matn AS Matn".format(topic[1].strip(), topic[-1])
 
   return query
 

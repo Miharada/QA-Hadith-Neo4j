@@ -7,9 +7,9 @@ from IPython.display import HTML
 app = Flask(__name__)
 app.secret_key = "secret key"
 
-uri = "bolt://54.234.87.147:7687"
+uri = "bolt://34.201.60.59:7687"
 user = "neo4j"
-pwd = "relocations-sisters-hoof"
+pwd = "hilltops-cares-relations"
 
 conn = neo.Neo4jConnection(uri=uri, user=user, pwd=pwd)
 print(conn)

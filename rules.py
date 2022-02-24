@@ -49,3 +49,17 @@ def text2cipher(text, conn):
         return top_cat_df
     except:
         print("Must Match The Rules")
+
+def neojarowinkler(text, conn):
+  try:
+    query_string = '''
+    WITH \"{}\" as seq1
+    MATCH (m:Matn) 
+    RETURN toInteger(apoc.text.jaroWinklerDistance(seq1,toLower(m.matn))*100) as similarity, m.matn
+    ORDER BY similarity DESC
+    LIMIT 5
+    '''.format(text)
+    top_cat_df = pd.DataFrame([dict(_) for _ in conn.query(query_string)])
+    return top_cat_df
+  except:
+    print("Wrong")

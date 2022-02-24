@@ -79,6 +79,10 @@
   </div>
 </form>
 
+{% if rules %}
+  <p>Rule Tidak ditemukan</p>
+{% endif %}
+
 {% if tableHadith %}
 <div id="mytablediv">
   {{ tableHadith }}

@@ -38,7 +38,8 @@ def rules(text, showpendapat=False):
     elif topic[-1] == "halal":
       topic[-1] = 'lawful'
     query="MATCH (b:Book)<-[:FROM_BOOK]-(m:Matn) WHERE m.matn CONTAINS \'{}\' and m.matn CONTAINS \'{}\' RETURN b.book AS Book, m.number AS Number, m.matn AS Matn".format(topic[1].strip(), topic[-1])
-
+  else:
+    query = "WITH '{}' as seq1 MATCH (a:Answer)-[:ANSWER_OF]->(q:Question)<-[:RELATED_WITH]-(m:Matn) RETURN toInteger(apoc.text.jaroWinklerDistance(seq1,q.question)*100) as similarity, q.question, m.matn, a.answer ORDER BY similarity DESC".format(text)
   return query
 
 def text2cipher(text, conn):
@@ -46,6 +47,11 @@ def text2cipher(text, conn):
         query_string = rules(text)
         print("APASUH",query_string)
         top_cat_df = pd.DataFrame([dict(_) for _ in conn.query(query_string)])
+        try:
+          top_cat_df= top_cat_df.sort_values(["similarity"], ascending=False)
+        except:
+          pass
+        print("HEY", top_cat_df)
         return top_cat_df
     except:
         print("Must Match The Rules")

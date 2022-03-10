@@ -25,19 +25,19 @@ def rules(text, showpendapat=False):
     query="MATCH {}(b:Book)<-[:FROM_BOOK]-(m:Matn)-[:NARRATED_BY]->(s:Sanad) WHERE toLower(s.name) CONTAINS toLower(\'{}\') and toLower(m.matn) CONTAINS toLower(\'{}\') RETURN s.name AS Sanad, b.book AS Book,m.number AS Number ,m.matn AS Matn{}".format(Qpendapat, topic[0].strip(), text.split()[-1], colPendapat)
     # print(query)
   
-  elif(re.search("show [a-zA-Z]+ hadith about [a-zA-Z]+ during|and|or [a-zA-Z]+", text)):
+  elif(re.search("show [a-zA-Z]+ hadith about [a-zA-Z]+ during|and [a-zA-Z]+", text)):
     topic = re.findall(r"\w+\s(?=\bduring\b|\band\b|\bor\b|\bwhile\b)", text) + re.findall(r"(?<=[\bor\b|\bduring\b|\band\b|\bwhile\b])\s\w+", text)
     print("Masuk ke 3 ", topic)
     query=r"MATCH (b:Book)<-[:FROM_BOOK]-(m:Matn) WHERE toLower(m.matn) =~ '(?i).*\\b{} \\b.*' AND toLower(m.matn) =~ '(?i).*\\b{} \\b.*' RETURN b.book AS Book, m.number AS Number, m.matn AS Matn".format(topic[0].strip(), topic[-1].strip())
     
-  elif(notEmpty(re.findall(r"is(\s+([a-zA-Z]+\s+)+)(halal|haram)\?", text))):
-    topic = list(re.findall(r"is(\s+([a-zA-Z]+\s+)+)(halal|haram)\?", text)[0])
-    print("Masuk 4", topic)
-    if topic[-1] == "haram":
-      topic[-1] = 'prohibited'
-    elif topic[-1] == "halal":
-      topic[-1] = 'lawful'
-    query="MATCH (b:Book)<-[:FROM_BOOK]-(m:Matn) WHERE m.matn CONTAINS \'{}\' and m.matn CONTAINS \'{}\' RETURN b.book AS Book, m.number AS Number, m.matn AS Matn".format(topic[1].strip(), topic[-1])
+#   elif(notEmpty(re.findall(r"is(\s+([a-zA-Z]+\s+)+)(halal|haram)\?", text))):
+#     topic = list(re.findall(r"is(\s+([a-zA-Z]+\s+)+)(halal|haram)\?", text)[0])
+#     print("Masuk 4", topic)
+#     if topic[-1] == "haram":
+#       topic[-1] = 'prohibited'
+#     elif topic[-1] == "halal":
+#       topic[-1] = 'lawful'
+#     query="MATCH (b:Book)<-[:FROM_BOOK]-(m:Matn) WHERE m.matn CONTAINS \'{}\' and m.matn CONTAINS \'{}\' RETURN b.book AS Book, m.number AS Number, m.matn AS Matn".format(topic[1].strip(), topic[-1])
   else:
     query = "WITH '{}' as seq1 MATCH (a:Answer)-[:ANSWER_OF]->(q:Question)<-[:RELATED_WITH]-(m:Matn) RETURN toInteger(apoc.text.jaroWinklerDistance(seq1,q.question)*100) as similarity, q.question, m.matn, a.answer ORDER BY similarity DESC".format(text)
   return query

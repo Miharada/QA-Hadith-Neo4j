@@ -1,15 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 
 import neo4jcon as neo
-from rules import text2cipher, neojarowinkler
+from rules import text2cipher, neojarowinkler, inputPendapatAhli
 from IPython.display import HTML
 
 app = Flask(__name__)
 app.secret_key = "secret key"
 
-uri = "neo4j+s://9209303b.databases.neo4j.io"
+# uri = "neo4j+s://9209303b.databases.neo4j.io"
+uri = "bolt://44.203.132.125:7687"
 user = "neo4j"
-pwd = "lGF8HuqTO2omc-egJm-8Koae9ZuqdM5MaeLCdVr2Rvo"
+# pwd = "lGF8HuqTO2omc-egJm-8Koae9ZuqdM5MaeLCdVr2Rvo"
+pwd = "toolboxes-dispatchers-rights"
 
 conn = neo.Neo4jConnection(uri=uri, user=user, pwd=pwd)
 print(conn)
@@ -21,6 +23,8 @@ def home_page():
 def generateHadith():
     text = request.form['statement']
     df = text2cipher(text.lower(), conn)
+    df.drop(columns=['Number'], inplace=True)
+    print("Halo", df)
     try:
         return render_template('QA_Hadith.html', statement=text, tableHadith=HTML(df.to_html(classes='table table-striped" id = "a_nice_table',
                                        index=False, border=0)), rules=False)
@@ -42,12 +46,34 @@ def generatehadithsimbased():
 def expertcomment():
     return render_template("ExpertPage.html")
 
+@app.route('/expertpage', methods=['POST'])
+def expertcommentprocess():
+    text = request.form['statement']
+    df = text2cipher(text.lower(), conn).head()
+    print("Halo", df)
+    # try:
+    return render_template('ExpertPage.html', datas=df, tableHadith=True, statement=text)
+    # except:
+    #     return render_template('ExpertPage.html', rules=True)
+
 @app.route('/qahadithv2')
 def qahadith2():
     return render_template("QA_v2.html")
 
+@app.route('/expertcomment', methods=['GET','POST'])
+def expertincomment():
+    if request.method == 'POST':
+        myid = request.form['nummatn']
+        name = request.form['recipient-name']
+        comment = request.form['message-text']
+        inputPendapatAhli(name, comment, myid, conn)
+        return redirect(url_for('expertcomment'))
+
+
+
+
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)
 
 #https://neo4j.com/developer/cypher/filtering-query-results/
-#https://neo4j.com/developer/cypher/guide-build-a-recommendation-engine/
+#https://neo4j.com/developer/cypher/guide-build-a-recommendation-engine/D

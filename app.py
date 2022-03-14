@@ -7,11 +7,11 @@ from IPython.display import HTML
 app = Flask(__name__)
 app.secret_key = "secret key"
 
-# uri = "neo4j+s://9209303b.databases.neo4j.io"
-uri = "bolt://44.203.132.125:7687"
+uri = "neo4j+s://9209303b.databases.neo4j.io"
+# uri = "bolt://44.203.132.125:7687"
 user = "neo4j"
-# pwd = "lGF8HuqTO2omc-egJm-8Koae9ZuqdM5MaeLCdVr2Rvo"
-pwd = "toolboxes-dispatchers-rights"
+pwd = "lGF8HuqTO2omc-egJm-8Koae9ZuqdM5MaeLCdVr2Rvo"
+# pwd = "toolboxes-dispatchers-rights"
 
 conn = neo.Neo4jConnection(uri=uri, user=user, pwd=pwd)
 print(conn)
@@ -73,7 +73,7 @@ def expertincomment():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
 
 #https://neo4j.com/developer/cypher/filtering-query-results/
 #https://neo4j.com/developer/cypher/guide-build-a-recommendation-engine/D

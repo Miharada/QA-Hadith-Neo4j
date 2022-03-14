@@ -30,16 +30,23 @@ def rules(text, showpendapat=False):
     print("Masuk ke 3 ", topic)
     query=r"MATCH (b:Book)<-[:FROM_BOOK]-(m:Matn) WHERE toLower(m.matn) =~ '(?i).*\\b{} \\b.*' AND toLower(m.matn) =~ '(?i).*\\b{} \\b.*' RETURN b.book AS Book, m.number AS Number, m.matn AS Matn".format(topic[0].strip(), topic[-1].strip())
     
-#   elif(notEmpty(re.findall(r"is(\s+([a-zA-Z]+\s+)+)(halal|haram)\?", text))):
-#     topic = list(re.findall(r"is(\s+([a-zA-Z]+\s+)+)(halal|haram)\?", text)[0])
-#     print("Masuk 4", topic)
-#     if topic[-1] == "haram":
-#       topic[-1] = 'prohibited'
-#     elif topic[-1] == "halal":
-#       topic[-1] = 'lawful'
-#     query="MATCH (b:Book)<-[:FROM_BOOK]-(m:Matn) WHERE m.matn CONTAINS \'{}\' and m.matn CONTAINS \'{}\' RETURN b.book AS Book, m.number AS Number, m.matn AS Matn".format(topic[1].strip(), topic[-1])
+  # elif(notEmpty(re.findall(r"is(\s+([a-zA-Z]+\s+)+)(halal|haram)\?", text))):
+  #   topic = list(re.findall(r"is(\s+([a-zA-Z]+\s+)+)(halal|haram)\?", text)[0])
+  #   print("Masuk 4", topic)
+  #   if topic[-1] == "haram":
+  #     topic[-1] = 'prohibited'
+  #   elif topic[-1] == "halal":
+  #     topic[-1] = 'lawful'
+  #   query="MATCH (b:Book)<-[:FROM_BOOK]-(m:Matn) WHERE m.matn CONTAINS \'{}\' and m.matn CONTAINS \'{}\' RETURN b.book AS Book, m.number AS Number, m.matn AS Matn".format(topic[1].strip(), topic[-1])
   else:
-    query = "WITH '{}' as seq1 MATCH (a:Answer)-[:ANSWER_OF]->(q:Question)<-[:RELATED_WITH]-(m:Matn) RETURN toInteger(apoc.text.jaroWinklerDistance(seq1,q.question)*100) as similarity, q.question, m.matn, a.answer ORDER BY similarity DESC".format(text)
+    query = '''
+    WITH "{}" as seq1
+    MATCH (a:Answer)-[:ANSWER_OF]->(q:Question)<-[:RELATED_WITH]-(m:Matn)
+    WITH toInteger(apoc.text.jaroWinklerDistance(seq1,q.question)*100) as similarity, a.answer AS Answer, m.matn AS Matn, q.question AS Question, m.id as Number
+    RETURN Question, Answer, Matn, Number
+    ORDER BY similarity DESC
+    LIMIT 10
+    '''.format(text)
   return query
 
 def text2cipher(text, conn):
@@ -69,3 +76,46 @@ def neojarowinkler(text, conn):
     return top_cat_df
   except:
     print("Wrong")
+
+
+
+def addAhli(name, conn):
+  query_name = "MERGE (a:Ahli{{name:\'{}\'}})".format(name)
+  return conn.query(query_name)
+
+def addPendapat(pendapat, conn):
+  query_pendapat = "MERGE (k:Pendapat{{pendapat:\'{}\'}})".format(pendapat)
+  return conn.query(query_pendapat)
+
+def addRelationPendapatAhli(name, pendapat, conn):
+  query = '''
+  MATCH (n:Ahli), (k:Pendapat)
+  WHERE n.name = \'{}\' AND k.pendapat = \'{}\'
+  MERGE (n)-[r:GIVE_COMMENT]->(k)
+  '''.format(name, pendapat)
+  return conn.query(query)
+
+def addRelationMatnPendapat(pendapat, no, conn):
+  # query  = '''
+  # MATCH (n:Pendapat), (m:Matn)
+  # WHERE n.pendapat = \'{}\' AND  apoc.text.replace(m.matn,'"','') = \"{}\"
+  # MERGE (m)-[r:COMMENT_ABOUT_HADITH]->(n)
+  # '''.format(pendapat, matn)
+
+  query = '''
+  MATCH (n:Pendapat), (m:Matn)
+  WHERE n.pendapat = \'{}\' AND m.matn = '{}'
+  MERGE (m)-[r:COMMENT_ABOUT_HADITH]->(n)
+  '''.format(pendapat, no)
+  return conn.query(query)
+
+def addRelationExpert(name, pendapat, matn, conn):
+  addAhli(name, conn)
+  addPendapat(pendapat, conn)
+  addRelationPendapatAhli(name, pendapat, conn)
+  addRelationMatnPendapat(pendapat, matn, conn)
+  return "Finish"
+
+def inputPendapatAhli(name, pendapat, matn, conn):
+  
+  return addRelationExpert(name, pendapat, matn, conn)

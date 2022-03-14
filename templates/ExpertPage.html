@@ -13,6 +13,16 @@
 <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js" type="text/javascript"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css"></script>
 
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> 
 <!-- https://stackoverflow.com/questions/55614780/pandas-to-datatable-using-jinja2 -->
 
 <section class="hero is-info">
@@ -34,14 +44,22 @@
   <article class="media">
     <div class="media-content">
       <div class="content">
-        <h3>Expert Page</h3>
-        <p>Halaman ini digunakan untuk Ahli hadist memberi pendapat pada hadist yang ada</p>
+        <h3>Template Phrases</h3>
+        <ul>
+          <li>Show all hadith that mention $[Topic] in the matn</li>
+          <li>Show all hadith narrated by $[Sanad] and talk about $[Topic]</li>
+          <li>Show all hadith about $[Topic] and $[Topic]</li>
+          <li>Is $[Topic] [Halal/Haram]?</li>
+          <li>Who is Sanad that mention about $[Topic] in the hadith ?</li>
+          <li>Is There any Hadith that tells about $[Topic]?</li>
+        </ul>
+        <p>Note: The characters in the queries can be of any case (lower/upper), the parsing would still work.</p>
       </div>
     </div>
   </article>
 </div>
 
-<div class="box">
+<!-- <div class="box">
   <article class="media">
     <div class="media-content">
       <div class="content">
@@ -59,55 +77,100 @@
       </div>
     </div>
   </article>
-</div>
+</div> -->
 
 <p>Enter a query below and click on the convert button or click on any of the paste buttons above and click on covert button:</p>
-<form method="POST" action=""{{ url_for('generateHadith') }}"">
-  <div>
-    <ul class="columns" data-columns="2">
-        <li>
-          <select class="form-select" aria-label="Default select example">
-            <option selected>Open this select menu</option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
-          </select>
-        </li>
-        <li>
-          <select class="form-select" aria-label="Default select example">
-            <option selected>Open this select menu</option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
-          </select>
-        </li>
-        <li>C</li>
-        <li>D</li>
-        <li>E</li>
-        <li>F</li>
-        <li>G</li>
-    </ul>
-</div>
+<form method="POST" action=""{{ url_for('expertcommentprocess') }}"">
+  <div class="field has-addons">
+    <p class="control is-expanded">
+    <input class="input" type="text" placeholder="English Query" name="statement" value="{{statement}}" data-multiple>
+    </p>
+    <p class="control">
+    <button class="button" type="submit">Run</button>
+    </p>
+  </div>
 </form>
+
+{% if rules %}
+  <p>Rule Tidak ditemukan</p>
+{% endif %}
 
 {% if tableHadith %}
 <div id="mytablediv">
-  
+  <table class="table">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">Question</th>
+        <th scope="col">Answer</th>
+        <th scope="col">Matn</th>
+        <th scope="col">Input Comment</button></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in range(datas|length) %}
+        <tr>
+          <td id="Question" value="{{datas.iloc[i][0]}}">{{datas.iloc[i][0]}}</td>
+          <td id="Answer">{{datas.iloc[i][1]}}</td>
+          <td id="Matn">{{datas.iloc[i][2]}}</td>
+          <td><button type="button" style='font-size:24px' class="inputexpert btn btn-success" data-toggle="modal" data-target="#exampleModal" data-id="{{datas.iloc[i][2]}}"><i class='fa fa-commenting'></i></button></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 
 {% endif %}
-
-
 
 <script>
   $(document).ready(function() {
     $('#a_nice_table').DataTable({
       pageLength:5,
-      lengthMenu:[[5, 10, 20, -1], [5, 10, 20, 'All']]
+      lengthMenu:[[5, 10, 20, -1], [5, 10, 20, 'All']],
+      order : [[ 0, "desc" ]]
     });
 });
 </script>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for('expertincomment') }}" method="POST" enctype="multipart/form-data" id="myForm"> 
+          <div class="form-group">
+            <label for="recipient-name" class="col-form-label">Expert's Name:</label>
+            <input type="text" class="form-control" name="recipient-name">
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="col-form-label">Comment:</label>
+            <textarea class="form-control" name="message-text"></textarea>
+          </div>
+           <input id="idmatn" name="nummatn" type="">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 </body>
+<script type="text/javascript">
+  $(document).on("click", ".inputexpert", function () {
+    var myid = $(this).data('id');
+    $("#idmatn").val( myid );
+
+
+
+});
+</script>
 
 <footer class="footer">
   <div class="container">

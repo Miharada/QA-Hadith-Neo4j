@@ -71,8 +71,12 @@
 
 <p>Enter a query below and click on the convert button or click on any of the paste buttons above and click on covert button:</p>
 <form method="POST" action=""{{ url_for('generateHadith') }}"">
+  <input type="checkbox" id="checkpendapat" name="checkpendapat" value="True">
+  <label for="checkpendapat">Expert Comment</label><br>
   <div class="field has-addons">
     <p class="control is-expanded">
+      <!-- <input type="checkbox" id="checkpendapat" name="checkpendapat" value="True">
+      <label for="checkpendapat">Expert Comment</label><br> -->
     <input class="input" type="text" placeholder="English Query" name="statement" value="{{statement}}" data-multiple>
     </p>
     <p class="control">
@@ -99,7 +103,7 @@
     $('#a_nice_table').DataTable({
       pageLength:5,
       lengthMenu:[[5, 10, 20, -1], [5, 10, 20, 'All']],
-      order : [[ 0, "desc" ]]
+      order : [[ 0, "asc" ]]
     });
 });
 </script>

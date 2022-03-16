@@ -82,7 +82,7 @@ def expertincomment():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
 
 #https://neo4j.com/developer/cypher/filtering-query-results/
 #https://neo4j.com/developer/cypher/guide-build-a-recommendation-engine/D

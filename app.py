@@ -8,10 +8,10 @@ app = Flask(__name__)
 app.secret_key = "secret key"
 
 uri = "neo4j+s://9209303b.databases.neo4j.io"
-# uri = "bolt://44.203.132.125:7687"
+# uri = "bolt://44.197.245.213:7687"
 user = "neo4j"
 pwd = "lGF8HuqTO2omc-egJm-8Koae9ZuqdM5MaeLCdVr2Rvo"
-# pwd = "toolboxes-dispatchers-rights"
+# pwd = "enemies-henry-sailors"
 
 conn = neo.Neo4jConnection(uri=uri, user=user, pwd=pwd)
 print(conn)
@@ -22,8 +22,17 @@ def home_page():
 @app.route('/', methods=['POST'])
 def generateHadith():
     text = request.form['statement']
-    df = text2cipher(text.lower(), conn)
-    df.drop(columns=['Number'], inplace=True)
+    try:
+        print("PENDAPAT")
+        showpendapat = request.form['checkpendapat']
+        print("Show Pendapat: ", showpendapat)
+        showpendapat=True
+        df = text2cipher(text.lower(), conn, showpendapat)
+    except:
+        print("BUKAN PENDAPAT")
+        df = text2cipher(text.lower(), conn)
+    if(len(df)>0):    
+        df.drop(columns=['Number'], inplace=True)
     print("Halo", df)
     try:
         return render_template('QA_Hadith.html', statement=text, tableHadith=HTML(df.to_html(classes='table table-striped" id = "a_nice_table',
@@ -73,7 +82,7 @@ def expertincomment():
 
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)
 
 #https://neo4j.com/developer/cypher/filtering-query-results/
 #https://neo4j.com/developer/cypher/guide-build-a-recommendation-engine/D

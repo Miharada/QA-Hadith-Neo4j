@@ -103,7 +103,9 @@
     $('#a_nice_table').DataTable({
       pageLength:5,
       lengthMenu:[[5, 10, 20, -1], [5, 10, 20, 'All']],
-      order : [[ 0, "asc" ]]
+      aoColumnDefs: [
+        { "bSortable": false, "aTargets": [ 0, 1, 2, 3 ] }, 
+        { "bSearchable": false, "aTargets": [ 0, 1, 2, 3 ] }]
     });
 });
 </script>

@@ -43,7 +43,7 @@ def generateHadith():
 @app.route('/qahadithv2', methods=['POST'])
 def generatehadithsimbased():
     text = request.form['statement']
-    df = neojarowinkler(text.lower(), conn)
+    df = levenshteinDistance(text.lower(), conn)
     try:
         return render_template('QA_v2.html', statement=text, tableHadith=HTML(df.to_html(classes='table table-striped" id = "a_nice_table',
                                        index=False, border=0)))

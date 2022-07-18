@@ -84,12 +84,12 @@ def text2cipher(text, conn, showpendapat=False):
         print(e)
         print("Must Match The Rules")
 
-def neojarowinkler(text, conn):
+def levenshteinDistance(text, conn):
   try:
     query_string = '''
     WITH \"{}\" as seq1
     MATCH (m:Matn) 
-    RETURN toInteger(apoc.text.jaroWinklerDistance(seq1,toLower(m.matn))*100) as similarity, m.matn
+    RETURN toInteger(apoc.text.levenshteinDistance(seq1,toLower(m.matn))) as similarity, m.matn
     ORDER BY similarity DESC
     LIMIT 5
     '''.format(text)

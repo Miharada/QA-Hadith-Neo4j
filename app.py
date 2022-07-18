@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 
 import neo4jcon as neo
-from rules import text2cipher, neojarowinkler, inputPendapatAhli
+from rules import text2cipher, levenshteinDistance, inputPendapatAhli
 from IPython.display import HTML
 
 app = Flask(__name__)
